@@ -10,7 +10,6 @@ namespace SoloLevellingApp.API.Models
         public int HabitId { get; set; } // Foreign key to Habit
         public Habit Habit { get; set; } // Navigation property to Habit
         public int UserId { get; set; } // Foreign key to User
-        public User User { get; set; } // Navigation property to User
         public HabitCompletion()
         {
             CompletedAt = DateTime.UtcNow;
