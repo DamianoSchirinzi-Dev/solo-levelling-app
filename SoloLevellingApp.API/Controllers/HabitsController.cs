@@ -29,7 +29,8 @@ namespace SoloLevellingApp.API.Controllers
                     Id = h.Id,
                     Name = h.Name,
                     Description = h.Description,
-                    CreatedAt = DateTime.UtcNow,
+                    Frequency = h.Frequency,
+                    CreatedAt = h.CreatedAt,
                 })
                 .ToList();
 
@@ -45,6 +46,7 @@ namespace SoloLevellingApp.API.Controllers
             {
                 Name = dto.Name,
                 Description = dto.Description,
+                Frequency = dto.Frequency,
                 UserId = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -58,6 +60,7 @@ namespace SoloLevellingApp.API.Controllers
                 Id = habit.Id,
                 Name = habit.Name,
                 Description = habit.Description,
+                Frequency = habit.Frequency,
                 CreatedAt = habit.CreatedAt
             };
 
@@ -74,6 +77,7 @@ namespace SoloLevellingApp.API.Controllers
 
             habit.Name = dto.Name;
             habit.Description = dto.Description;
+            habit.Frequency = dto.Frequency;
             habit.UpdatedAt = DateTime.UtcNow;
 
             _appDbContext.SaveChanges();
@@ -82,8 +86,9 @@ namespace SoloLevellingApp.API.Controllers
             {
                 Id = habit.Id,
                 Name = habit.Name,
-                Description = dto.Description,
-                CreatedAt = DateTime.UtcNow
+                Description = habit.Description,
+                Frequency = habit.Frequency,
+                CreatedAt = habit.CreatedAt
             };
 
             return Ok(habitDto);

@@ -1,5 +1,6 @@
 ﻿using Npgsql;
 using SoloLevellingApp.API.Data;
+using SoloLevellingApp.API.Helpers;
 using SoloLevellingApp.API.Models;
 
 namespace SoloLevellingApp.API.Services
@@ -18,12 +19,20 @@ namespace SoloLevellingApp.API.Services
             var user = _context.Users.FirstOrDefault(u => u.Id == userId);
             if (user == null) return;
 
-            user.XP = xpAmount;
+            user.XP += xpAmount;
             if(user.XP >= user.Level * 100)
             {
+                user.XP -= user.Level * 100;
                 user.Level += 1;
-                user.XP = 0;
             }
+
+            // Calculate current streak for logging
+            var completions = _context.HabitCompletions
+                .Where(h => h.UserId == userId)
+                .OrderByDescending(c => c.CompletedAt)
+                .ToList();
+
+            var currentStreak = ApiHelpers.CalculateStreak(completions);
 
             var log = new XPLog
             {
@@ -33,7 +42,7 @@ namespace SoloLevellingApp.API.Services
                 XPAmount = xpAmount,
                 Timestamp = DateTime.UtcNow,
                 Description = reason ?? "Completed habit",
-                Streak = 0 // optional: plug in streak service here
+                Streak = currentStreak
             };
 
             _context.XPLogs.Add(log);

@@ -1,0 +1,52 @@
+# Handle line endings
+* text=auto
+* text eol=lf
+
+# C# / .NET files
+*.cs      text diff=csharp
+*.csproj  text
+*.sln     text
+*.config  text
+*.resx    text
+*.xaml    text
+*.targets text
+*.props   text
+
+# Frontend (JS/TS/HTML/CSS/Vue)
+*.js      text
+*.ts      text
+*.jsx     text
+*.tsx     text
+*.vue     text
+*.json    text
+*.html    text
+*.css     text
+*.scss    text
+*.md      text
+*.yml     text
+*.yaml    text
+
+# Shell scripts (force LF)
+*.sh      text eol=lf
+
+# Windows scripts
+*.ps1     text eol=crlf
+*.cmd     text eol=crlf
+*.bat     text eol=crlf
+
+# Binary files
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.pdf     binary
+*.zip     binary
+*.dll     binary
+*.exe     binary
+
+# Ignore VSCode settings from line-ending conversions
+.vscode/* text
+
+# Ignore user-specific .NET settings
+*.user    text

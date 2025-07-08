@@ -26,12 +26,18 @@ namespace SoloLevellingApp.API.Controllers
         public IActionResult CompleteHabit(int habitId)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            
+            var habit = _appDbContext.Habits
+                .FirstOrDefault(h => h.Id == habitId && h.UserId == userId);
 
-            var exists = _appDbContext.HabitCompletions.Any(c =>
-                c.HabitId == habitId && c.UserId == userId &&
-                c.CompletedAt == DateTime.UtcNow.Date);
+            if(habit == null) return NotFound("Habit not found");
 
-            if (exists) return BadRequest("Habit already completed");
+            var alreadyCompleted = _appDbContext.HabitCompletions.Any(c => 
+                c.HabitId == habitId && 
+                c.UserId == userId &&
+                c.CompletedAt.Date == DateTime.UtcNow.Date);
+
+            if (alreadyCompleted) return BadRequest("Habit already completed today.");
 
             var completion = new HabitCompletion
             {
@@ -48,7 +54,7 @@ namespace SoloLevellingApp.API.Controllers
                 habitId,
                 completion.Id,
                 xpAmount: 10,
-                reason: "Completed habit"
+                reason: $"Completed habit: {habit.Name}"
             );
 
             return Ok(new HabitCompletionDto

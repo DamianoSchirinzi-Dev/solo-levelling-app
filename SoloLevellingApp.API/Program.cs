@@ -70,6 +70,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<XPService>();
+builder.Services.AddHostedService<DailyResetService>();
 
 var app = builder.Build();
 
