@@ -47,12 +47,12 @@ namespace SoloLevellingApp.API.Controllers
         public IActionResult Login(LoginDto loginDto)
         {
             var user = _context.Users
-                .FirstOrDefault(u => u.Username == loginDto.Username);
+                .FirstOrDefault(u => u.Username == loginDto.Identifier || u.Email == loginDto.Identifier);
 
             if (user == null || !_authService.VerifyPassword(loginDto.Password, user.PasswordHash))
-                return Unauthorized("Invalid username or password.");
+                return Unauthorized("Invalid credentials.");
 
-            user.LastLogin = DateTime.UtcNow;   
+            user.LastLogin = DateTime.UtcNow;
             _context.SaveChanges();
 
             return Ok(new {Token = _authService.GenerateJwtToken(user) });

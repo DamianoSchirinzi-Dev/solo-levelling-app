@@ -2,7 +2,7 @@
 
 namespace SoloLevellingApp.API.Models.DTOs
 {
-        public class CreateHabitDto
+    public class CreateHabitDto
     {
         public string Name { get; set; }
         public string Description { get; set; }
