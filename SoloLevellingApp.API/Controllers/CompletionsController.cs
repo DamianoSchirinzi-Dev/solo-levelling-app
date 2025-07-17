@@ -22,6 +22,28 @@ namespace SoloLevellingApp.API.Controllers
             _xpService = xpService;
         }
 
+        [HttpGet("user-completions")]
+        public IActionResult GetTodayUserCompletions()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var today = DateTime.UtcNow;
+
+            var completions = _appDbContext.HabitCompletions.Where(h => h.UserId == userId && 
+                h.CompletedAt.Date == today.Date)
+                .Select(c => new HabitCompletionDto
+                {
+                    Id = c.Id,
+                    HabitId = c.HabitId,
+                    CompletedAt = c.CompletedAt
+                })
+                .ToList();
+
+
+            if (!completions.Any()) return NotFound("No Completions found for today");
+
+            return Ok(completions);
+        }
+
         [HttpPost("{habitId}/complete")]
         public IActionResult CompleteHabit(int habitId)
         {
@@ -63,6 +85,30 @@ namespace SoloLevellingApp.API.Controllers
                 HabitId = completion.HabitId,
                 CompletedAt = completion.CompletedAt,
             });
+        }
+
+        [HttpDelete("{habitId}/uncomplete")]
+        public IActionResult UncompleteHabit(int habitId)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var completion = _appDbContext.HabitCompletions
+                .Where(c =>
+                    c.HabitId == habitId &&
+                    c.UserId == userId &&
+                    c.CompletedAt.Date == DateTime.UtcNow.Date)
+                .OrderByDescending(c => c.CompletedAt)
+                .FirstOrDefault();
+
+            if (completion == null)
+                return NotFound("No completion found for today to uncomplete.");
+
+            _appDbContext.HabitCompletions.Remove(completion);
+            _appDbContext.SaveChanges();
+
+            _xpService.RefreshUserProgress(userId);
+
+            return NoContent();
         }
     }
 }

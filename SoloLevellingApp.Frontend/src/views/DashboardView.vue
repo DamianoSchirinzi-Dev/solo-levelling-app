@@ -250,18 +250,25 @@ const fetchChartData = async () => {
 const toggleHabitCompletion = async (habit: Habit) => {
   isToggling.value = true;
   try {
-    // In a real app, this would be an API call
-    // await fetch(`/api/habits/complete/${habit.id}`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ completed: !habit.completed })
-    // })
 
-    // Mock API response
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    console.log(`Habit ${habit}`);
+    if (habit.completed) {
+      // If already completed, uncomplete it
+      console.log(`Uncompleting habit: ${habit.name}`);
+      await habitStore.uncompleteHabit(habit.id);
+    } else {
+      // If not completed, complete it
+      console.log(`Completing habit: ${habit.name}`);
+      await habitStore.uncompleteHabit(habit.id);
+    }
 
     // Update local state
     habit.completed = !habit.completed;
+    console.log(
+      `Habit ${habit.name} marked as ${
+        habit.completed ? "completed" : "not completed"
+      }`
+    );
 
     // If completing a habit, update XP
     if (habit.completed) {
@@ -359,6 +366,8 @@ const initChart = () => {
 onMounted(async () => {
   await userStore.fetchUserProfile();
   await habitStore.fetchTodayHabits();
-  fetchChartData(); // keep this as-is
+  await habitStore.getUserCompletions();
+
+  fetchChartData();
 });
 </script>
