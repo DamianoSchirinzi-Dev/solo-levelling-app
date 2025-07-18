@@ -67,7 +67,7 @@
               Habits Completed
             </h3>
             <div class="text-3xl font-bold">
-              {{ completedHabitsCount }} / {{ habits.length }}
+              {{ completedHabitsCount }} / {{ todayHabits.length }}
             </div>
           </div>
           <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
@@ -106,7 +106,7 @@
           </div>
 
           <div
-            v-else-if="habits.length === 0"
+            v-else-if="todayHabits.length === 0"
             class="text-center py-8 text-gray-400"
           >
             <div class="text-5xl mb-4">🏆</div>
@@ -115,7 +115,7 @@
 
           <div v-else class="space-y-4">
             <div
-              v-for="habit in habits"
+              v-for="habit in todayHabits"
               :key="habit.id"
               class="bg-gray-700 rounded-lg p-4 flex items-center transition-all duration-200"
               :class="{
@@ -181,9 +181,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
-import { UserProfile, type Habit } from "../types/interfaces";
-import { useUserStore } from "@/store/userStore";
-import { useHabitStore } from "@/store/habitStore";
+import { type UserProfile, type Habit } from "../types/interfaces";
+import { useUserStore } from "../store/userStore";
+import { useHabitStore } from "../store/habitStore";
 import Chart from "chart.js/auto";
 
 // Types
@@ -198,7 +198,7 @@ const userStore = useUserStore();
 const habitStore = useHabitStore();
 
 // State
-const habits = computed(() => habitStore.habits);
+const todayHabits = computed(() => habitStore.todayHabits);
 const loading = computed(() => habitStore.isLoading);
 const userProfile = computed(() => userStore.userProfile as UserProfile);
 const chartData = ref<ChartData[]>([]);
@@ -208,12 +208,13 @@ let chart: Chart | null = null;
 
 // Computed properties
 const completedHabitsCount = computed(
-  () => habits.value.filter((h) => h.completed).length
+  () => todayHabits.value.filter((h: Habit) => h.completed).length
 );
+
 const totalXpEarned = computed(() =>
-  habits.value
-    .filter((h) => h.completed)
-    .reduce((sum, habit) => sum + (habit.xpValue || 0), 0)
+  todayHabits.value
+    .filter((h: Habit) => h.completed)
+    .reduce((sum: number, habit: Habit) => sum + (habit.xpValue || 0), 0)
 );
 
 // Methods
@@ -250,48 +251,32 @@ const fetchChartData = async () => {
 const toggleHabitCompletion = async (habit: Habit) => {
   isToggling.value = true;
   try {
+    console.log(`Toggling habit ${habit.name} (ID: ${habit.id})`);
 
-    console.log(`Habit ${habit}`);
-    if (habit.completed) {
-      // If already completed, uncomplete it
-      console.log(`Uncompleting habit: ${habit.name}`);
-      await habitStore.uncompleteHabit(habit.id);
-    } else {
-      // If not completed, complete it
-      console.log(`Completing habit: ${habit.name}`);
-      await habitStore.uncompleteHabit(habit.id);
+    await habitStore.completeHabit(habit.id);
+
+    habit.completed = !habit.completed;
+
+    // Add XP
+    userProfile.value.currentXP += habit.xpValue || 0;
+
+    // Level up if enough XP
+    if (userProfile.value.currentXP >= userProfile.value.XPToNextLevel) {
+      userProfile.value.level += 1;
+      userProfile.value.currentXP -= userProfile.value.XPToNextLevel;
+      userProfile.value.XPToNextLevel = Math.round(
+        userProfile.value.XPToNextLevel * 1.5
+      );
+
+      // Show level up notification (in a real app)
+      alert(`🎉 Level Up! You are now level ${userProfile.value.level}!`);
     }
 
-    // Update local state
-    habit.completed = !habit.completed;
     console.log(
       `Habit ${habit.name} marked as ${
-        habit.completed ? "completed" : "not completed"
+        !habit.completed ? "completed" : "not completed"
       }`
     );
-
-    // If completing a habit, update XP
-    if (habit.completed) {
-      userProfile.value.currentXP += habit.xpValue;
-
-      // Level up if enough XP
-      if (userProfile.value.currentXP >= userProfile.value.XPToNextLevel) {
-        userProfile.value.level += 1;
-        userProfile.value.currentXP -= userProfile.value.XPToNextLevel;
-        userProfile.value.XPToNextLevel = Math.round(
-          userProfile.value.XPToNextLevel * 1.5
-        );
-
-        // Show level up notification (in a real app)
-        alert(`🎉 Level Up! You are now level ${userProfile.value.level}!`);
-      }
-    } else {
-      // If uncompleting, remove XP (but don't drop level)
-      userProfile.value.currentXP = Math.max(
-        0,
-        userProfile.value.currentXP - habit.xpValue
-      );
-    }
   } catch (error) {
     console.error("Error toggling habit completion:", error);
   } finally {
@@ -367,6 +352,9 @@ onMounted(async () => {
   await userStore.fetchUserProfile();
   await habitStore.fetchTodayHabits();
   await habitStore.getUserCompletions();
+
+  // Ensure habits are marked as completed after both habits and completions are fetched
+  habitStore.markHabitsAsCompleted();
 
   fetchChartData();
 });

@@ -10,6 +10,7 @@ import type {
 export const useHabitStore = defineStore("habit", {
   state: () => ({
     habits: [] as Habit[],
+    todayHabits: [] as Habit[],
     completions: [] as HabitCompletionDto[],
     isLoading: false,
     error: "" as string | null,
@@ -68,12 +69,15 @@ export const useHabitStore = defineStore("habit", {
 
         console.log("Today's habits response:", response.data);
         if (Array.isArray(response.data)) {
-          this.habits = response.data;
+          this.todayHabits = response.data;
         } else {
-          this.habits = [];
+          this.todayHabits = [];
         }
 
-        return this.habits;
+        // Mark habits as completed based on completions array
+        this.markHabitsAsCompleted();
+
+        return this.todayHabits;
       } catch (error: any) {
         this.error =
           error.response?.data?.message || "Failed to fetch today's habits.";
@@ -84,10 +88,30 @@ export const useHabitStore = defineStore("habit", {
       }
     },
 
+    markHabitsAsCompleted() {
+      if (
+        !Array.isArray(this.completions) ||
+        !Array.isArray(this.todayHabits)
+      ) {
+        return;
+      }
+
+      // Create a Set of completed habit IDs for efficient lookup
+      const completedHabitIds = new Set(
+        this.completions.map((completion) => completion.habitId)
+      );
+
+      // Update todayHabits with completion status
+      this.todayHabits = this.todayHabits.map((habit) => ({
+        ...habit,
+        completed: completedHabitIds.has(habit.id),
+      }));
+    },
+
     async createHabit(habitData: CreateHabitDto) {
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/api/habits/createHabit`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/habits/create`,
           habitData
         );
         this.habits.push(response.data);
@@ -160,12 +184,14 @@ export const useHabitStore = defineStore("habit", {
         console.error(message);
         throw new Error(message);
       }
-    },    
+    },
     async uncompleteHabit(habitId: number): Promise<void> {
       console.log("Uncompleting habit with ID:", habitId);
       try {
         await axios.delete(
-          `${import.meta.env.VITE_API_BASE_URL}/api/completions/${habitId}/uncomplete`
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/api/completions/${habitId}/uncomplete`
         );
 
         const index = this.habits.findIndex((h) => h.id === habitId);
@@ -193,23 +219,29 @@ export const useHabitStore = defineStore("habit", {
         throw new Error(message);
       }
     },
-
+    
     async getUserCompletions(): Promise<HabitCompletionDto[]> {
-      
       console.log("Fetching user completions...");
 
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/api/completions/user-completions`
+          `${import.meta.env.VITE_API_BASE_URL}/api/completions/today`
         );
 
         this.completions = response.data;
-        if (!Array.isArray(this.completions)) { 
-          console.warn("Expected an array of completions, got:", this.completions);
+        if (!Array.isArray(this.completions)) {
+          console.warn(
+            "Expected an array of completions, got:",
+            this.completions
+          );
           this.completions = [];
         }
 
         console.log("User completions response:", response.data);
+
+        // Mark habits as completed based on the fetched completions
+        this.markHabitsAsCompleted();
+
         return this.completions;
       } catch (error: any) {
         const message =
