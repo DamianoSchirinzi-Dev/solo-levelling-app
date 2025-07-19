@@ -75,7 +75,7 @@ namespace SoloLevellingApp.API.Controllers
                 userId,
                 habitId,
                 completion.Id,
-                xpAmount: 10,
+                xpAmount: habit.XpValue,
                 reason: $"Completed habit: {habit.Name}"
             );
 

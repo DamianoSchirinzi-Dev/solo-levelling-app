@@ -33,7 +33,7 @@
                 v-model="form.name"
                 type="text"
                 required
-                maxlength="100"
+                maxlength="20"
                 class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                 :class="{ 'border-red-500': errors.name }"
                 placeholder="e.g., Morning Meditation, Daily Coding Practice"
@@ -42,7 +42,7 @@
                 {{ errors.name }}
               </div>
               <div class="text-gray-400 text-sm mt-1">
-                {{ form.name.length }}/100 characters
+                {{ form.name.length }}/20 characters
               </div>
             </div>
 
@@ -55,166 +55,167 @@
                 id="description"
                 v-model="form.description"
                 rows="3"
-                maxlength="500"
+                maxlength="250"
                 class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors resize-none"
+                :class="{ 'border-red-500': errors.description }"
                 placeholder="Describe what this habit involves and why it's important to you..."
               ></textarea>
-              <div class="text-gray-400 text-sm mt-1">
-                {{ form.description.length }}/500 characters
+              <div v-if="errors.description" class="text-red-400 text-sm mt-1">
+                {{ errors.description }}
+              </div>
+              <div
+                class="text-gray-400 text-sm mt-1"
+                :class="{ 'text-red-400': form.description.length > 250 }"
+              >
+                {{ form.description.length }}/250 characters
               </div>
             </div>
 
-            <!-- Frequency and Category Row -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Frequency Field -->
-              <div>
-                <label class="block text-sm font-medium mb-2">
-                  Quest Frequency <span class="text-red-500">*</span>
-                </label>
-                <div class="space-y-2">
-                  <label class="flex items-center">
-                    <input
-                      v-model.number="form.frequency"
-                      type="radio"
-                      :value="HabitFrequency.Daily"
-                      class="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 focus:ring-purple-500"
-                    />
-                    <span class="ml-2">Daily Quest</span>
-                    <span class="ml-auto text-sm text-gray-400">Every day</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input
-                      v-model.number="form.frequency"
-                      type="radio"
-                      :value="HabitFrequency.Weekly"
-                      class="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 focus:ring-purple-500"
-                    />
-                    <span class="ml-2">Weekly Quest</span>
-                    <span class="ml-auto text-sm text-gray-400"
-                      >Once per week</span
-                    >
-                  </label>
-                </div>
-              </div>
-
-              <!-- Category Field -->
-              <div>
-                <label for="category" class="block text-sm font-medium mb-2">
-                  Quest Category
-                </label>
-                <select
-                  id="category"
-                  v-model="form.category"
-                  class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                >
-                  <option value="">Select a category</option>
-                  <option value="Health">🏃 Health & Fitness</option>
-                  <option value="Learning">📚 Learning & Skills</option>
-                  <option value="Productivity">⚡ Productivity</option>
-                  <option value="Mindfulness">🧘 Mindfulness</option>
-                  <option value="Social">👥 Social & Relationships</option>
-                  <option value="Creative">🎨 Creative & Hobbies</option>
-                  <option value="Career">💼 Career & Finance</option>
-                  <option value="Other">🌟 Other</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Difficulty and XP Row -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Difficulty Level -->
-              <div>
-                <label class="block text-sm font-medium mb-2">
-                  Difficulty Level <span class="text-red-500">*</span>
-                </label>
-                <div class="space-y-2">
-                  <label
-                    v-for="difficulty in difficultyLevels"
-                    :key="difficulty.value"
-                    class="flex items-center p-3 rounded-lg border transition-colors cursor-pointer"
-                    :class="
-                      form.difficulty === difficulty.enumValue
-                        ? 'border-purple-500 bg-purple-900/30'
-                        : 'border-gray-600 hover:border-gray-500'
-                    "
-                  >
-                    <input
-                      v-model="form.difficulty"
-                      type="radio"
-                      :value="difficulty.enumValue"
-                      class="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 focus:ring-purple-500"
-                    />
-                    <div class="ml-3 flex-1">
-                      <div class="flex items-center gap-2">
-                        <span
-                          >{{ difficulty.emoji }} {{ difficulty.label }}</span
-                        >
-                        <span class="text-yellow-500 font-bold"
-                          >+{{ difficulty.xp }} XP</span
-                        >
-                      </div>
-                      <div class="text-sm text-gray-400">
-                        {{ difficulty.description }}
-                      </div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Custom XP (if needed) -->
-              <div>
-                <label for="xpValue" class="block text-sm font-medium mb-2">
-                  Custom XP Value
-                </label>
-                <input
-                  id="xpValue"
-                  v-model.number="form.xpValue"
-                  type="number"
-                  min="0"
-                  max="200"
-                  class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                  placeholder="Leave empty to use difficulty XP"
-                />
-                <div class="text-gray-400 text-sm mt-1">
-                  Override the difficulty-based XP value
-                </div>
-              </div>
-            </div>
-
-            <!-- Reminder Settings -->
-            <div class="bg-gray-700/50 rounded-lg p-4">
-              <h3 class="font-medium mb-3 flex items-center gap-2">
-                <BellIcon class="w-5 h-5" />
-                Reminder Settings
-              </h3>
-
-              <div class="space-y-3">
+            <!-- Enhanced Frequency Field with validation -->
+            <div>
+              <label class="block text-sm font-medium mb-2">
+                Quest Frequency <span class="text-red-500">*</span>
+              </label>
+              <div
+                class="space-y-2"
+                :class="{
+                  'border border-red-500 rounded-lg p-2': errors.frequency,
+                }"
+              >
                 <label class="flex items-center">
                   <input
-                    v-model="form.reminderEnabled"
-                    type="checkbox"
-                    class="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+                    v-model.number="form.frequency"
+                    type="radio"
+                    :value="HabitFrequency.Daily"
+                    class="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 focus:ring-purple-500"
                   />
-                  <span class="ml-2">Enable daily reminders</span>
+                  <span class="ml-2">Daily Quest</span>
+                  <span class="ml-auto text-sm text-gray-400">Every day</span>
                 </label>
+                <label class="flex items-center">
+                  <input
+                    v-model.number="form.frequency"
+                    type="radio"
+                    :value="HabitFrequency.Weekly"
+                    class="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 focus:ring-purple-500"
+                  />
+                  <span class="ml-2">Weekly Quest</span>
+                  <span class="ml-auto text-sm text-gray-400"
+                    >Once per week</span
+                  >
+                </label>
+              </div>
+              <div v-if="errors.frequency" class="text-red-400 text-sm mt-1">
+                {{ errors.frequency }}
+              </div>
+            </div>
 
-                <div v-if="form.reminderEnabled" class="ml-6 space-y-2">
-                  <div>
-                    <label
-                      for="reminderTime"
-                      class="block text-sm text-gray-400 mb-1"
-                    >
-                      Reminder Time
-                    </label>
-                    <input
-                      id="reminderTime"
-                      v-model="form.reminderTime"
-                      type="time"
-                      class="px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
+            <!-- Enhanced Difficulty Level with validation -->
+            <div>
+              <label class="block text-sm font-medium mb-2">
+                Difficulty Level <span class="text-red-500">*</span>
+              </label>
+              <div
+                class="space-y-2"
+                :class="{
+                  'border border-red-500 rounded-lg p-2': errors.difficulty,
+                }"
+              >
+                <label
+                  v-for="difficulty in difficultyLevels"
+                  :key="difficulty.value"
+                  class="flex items-center p-3 rounded-lg border transition-colors cursor-pointer"
+                  :class="
+                    form.difficulty === difficulty.enumValue
+                      ? 'border-purple-500 bg-purple-900/30'
+                      : 'border-gray-600 hover:border-gray-500'
+                  "
+                >
+                  <input
+                    v-model.number="form.difficulty"
+                    type="radio"
+                    :value="difficulty.enumValue"
+                    class="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 focus:ring-purple-500"
+                  />
+                  <div class="ml-3 flex-1">
+                    <div class="flex items-center gap-2">
+                      <span>{{ difficulty.emoji }} {{ difficulty.label }}</span>
+                      <span class="text-yellow-500 font-bold"
+                        >+{{ difficulty.xp }} XP</span
+                      >
+                    </div>
+                    <div class="text-sm text-gray-400">
+                      {{ difficulty.description }}
+                    </div>
                   </div>
+                </label>
+              </div>
+              <div v-if="errors.difficulty" class="text-red-400 text-sm mt-1">
+                {{ errors.difficulty }}
+              </div>
+            </div>
+
+            <!-- Enhanced Custom XP with validation -->
+            <div>
+              <label for="xpValue" class="block text-sm font-medium mb-2">
+                Custom XP Value
+              </label>
+              <input
+                id="xpValue"
+                v-model.number="form.xpValue"
+                type="number"
+                min="1"
+                max="200"
+                class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                :class="{ 'border-red-500': errors.xpValue }"
+                placeholder="Leave empty to use difficulty XP"
+              />
+              <div v-if="errors.xpValue" class="text-red-400 text-sm mt-1">
+                {{ errors.xpValue }}
+              </div>
+              <div class="text-gray-400 text-sm mt-1">
+                Override the difficulty-based XP value (1-200)
+              </div>
+            </div>
+
+            <!-- Enhanced Reminder Time with validation -->
+            <div v-if="form.reminderEnabled" class="ml-6 space-y-2">
+              <div>
+                <label
+                  for="reminderTime"
+                  class="block text-sm text-gray-400 mb-1"
+                >
+                  Reminder Time <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="reminderTime"
+                  v-model="form.reminderTime"
+                  type="time"
+                  class="px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  :class="{ 'border-red-500': errors.reminderTime }"
+                />
+                <div
+                  v-if="errors.reminderTime"
+                  class="text-red-400 text-sm mt-1"
+                >
+                  {{ errors.reminderTime }}
                 </div>
               </div>
+            </div>
+
+            <!-- Form validation summary (optional) -->
+            <div
+              v-if="hasErrors && Object.values(errors).some((e) => e !== '')"
+              class="bg-red-900/30 border border-red-700 rounded-lg p-4"
+            >
+              <h4 class="text-red-400 font-medium mb-2">
+                Please fix the following errors:
+              </h4>
+              <ul class="text-red-300 text-sm space-y-1">
+                <li v-for="(error, field) in errors" :key="field" v-if="errors">
+                  {{ error }}
+                </li>
+              </ul>
             </div>
 
             <!-- XP Preview -->
@@ -337,10 +338,6 @@ const form = reactive<HabitForm>({
   reminderTime: "09:00",
 });
 
-const errors = reactive({
-  name: "",
-});
-
 const isSubmitting = ref(false);
 const showSuccess = ref(false);
 
@@ -385,18 +382,40 @@ const finalXpValue = computed(() => {
   if (form.xpValue && form.xpValue > 0) {
     return form.xpValue;
   }
-  const difficulty = difficultyLevels.find((d) => d.enumValue === form.difficulty);
+  const difficulty = difficultyLevels.find(
+    (d) => d.enumValue === form.difficulty
+  );
   console.log("Final XP Value Computed:", difficulty?.xp);
   return difficulty?.xp || 10;
 });
 
+const errors = reactive({
+  name: "",
+  description: "",
+  frequency: "",
+  difficulty: "",
+  xpValue: "",
+  reminderTime: "",
+});
+
 const isFormValid = computed(() => {
   return (
-    form.name.trim().length > 0
+    form.name.trim().length >= 3 &&
+    form.name.trim().length <= 20 &&
+    form.description.length <= 250 &&
+    form.frequency !== null &&
+    form.difficulty !== null &&
+    (!form.xpValue || (form.xpValue >= 1 && form.xpValue <= 200)) &&
+    (!form.reminderEnabled || form.reminderTime) &&
+    !hasErrors.value
   );
 });
 
-// Methods
+const hasErrors = computed(() => {
+  return Object.values(errors).some((error) => error !== "");
+});
+
+// Validation Methods
 const validateTitle = () => {
   errors.name = "";
   if (!form.name.trim()) {
@@ -408,10 +427,62 @@ const validateTitle = () => {
   }
 };
 
-const submitHabit = async () => {
+const validateDescription = () => {
+  errors.description = "";
+  if (form.description.length > 250) {
+    errors.description = "Description must be 250 characters or less";
+  }
+};
+
+const validateFrequency = () => {
+  errors.frequency = "";
+  if (form.frequency === null || form.frequency === undefined) {
+    errors.frequency = "Please select a quest frequency";
+  }
+};
+
+const validateDifficulty = () => {
+  errors.difficulty = "";
+  if (form.difficulty === null || form.difficulty === undefined) {
+    errors.difficulty = "Please select a difficulty level";
+  }
+};
+
+const validateXpValue = () => {
+  errors.xpValue = "";
+  if (form.xpValue !== null && form.xpValue !== undefined) {
+    if (form.xpValue < 1) {
+      errors.xpValue = "XP value must be at least 1";
+    } else if (form.xpValue > 200) {
+      errors.xpValue = "XP value cannot exceed 200";
+    }
+  }
+};
+
+const validateReminderTime = () => {
+  errors.reminderTime = "";
+  if (form.reminderEnabled && !form.reminderTime) {
+    errors.reminderTime =
+      "Reminder time is required when reminders are enabled";
+  }
+};
+
+const validateAllFields = () => {
   validateTitle();
+  validateDescription();
+  validateFrequency();
+  validateDifficulty();
+  validateXpValue();
+  validateReminderTime();
+};
+
+// Methods
+const submitHabit = async () => {
+  // Validate all fields before submission
+  validateAllFields();
 
   if (!isFormValid.value) {
+    console.log("Form validation failed:", errors);
     return;
   }
 
@@ -426,7 +497,7 @@ const submitHabit = async () => {
       difficulty: form.difficulty,
       xpValue: finalXpValue.value,
       reminderEnabled: form.reminderEnabled,
-      reminderTime: "09:00",
+      reminderTime: form.reminderTime || "09:00",
     };
 
     const response = await habitStore.createHabit(habitData);
@@ -464,6 +535,11 @@ const resetForm = () => {
   });
   Object.assign(errors, {
     name: "",
+    description: "",
+    frequency: "",
+    difficulty: "",
+    xpValue: "",
+    reminderTime: "",
   });
 };
 
@@ -476,5 +552,12 @@ const goBack = () => {
 // Watch for name changes to validate in real-time
 import { watch } from "vue";
 import { Difficulty, HabitFrequency } from "../types/enums";
+
 watch(() => form.name, validateTitle);
+watch(() => form.description, validateDescription);
+watch(() => form.frequency, validateFrequency);
+watch(() => form.difficulty, validateDifficulty);
+watch(() => form.xpValue, validateXpValue);
+watch(() => form.reminderTime, validateReminderTime);
+watch(() => form.reminderEnabled, validateReminderTime);
 </script>

@@ -96,6 +96,20 @@ export const useUserStore = defineStore("user", {
       }
     },
 
+    async updateUserProfile(profileData: UserProfile) {
+      try {
+        const response = await axios.put(
+          `${import.meta.env.VITE_API_BASE_URL}/api/user/profile`,
+          profileData
+        );
+
+        this.userProfile = response.data;
+      } catch (error: any) {
+        console.error("Failed to update profile:", error);
+        throw new Error("Unable to update user profile.");
+      }
+    },
+
     logout() {
       this.user = null;
       this.token = null;

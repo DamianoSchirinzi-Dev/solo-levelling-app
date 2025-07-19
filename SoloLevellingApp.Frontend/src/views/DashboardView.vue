@@ -186,6 +186,7 @@ import { useUserStore } from "../store/userStore";
 import { useHabitStore } from "../store/habitStore";
 import { useEnumLabels } from "../composables/Labels";
 import Chart from "chart.js/auto";
+import { User } from "lucide-vue-next";
 
 // Types
 interface ChartData {
@@ -261,6 +262,8 @@ const toggleHabitCompletion = async (habit: Habit) => {
 
     // Add XP
     userProfile.value.currentXP += habit.xpValue || 0;
+
+    console.log("User Profile: {0}", userProfile)
 
     // Level up if enough XP
     if (userProfile.value.currentXP >= userProfile.value.XPToNextLevel) {
