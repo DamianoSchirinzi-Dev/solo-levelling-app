@@ -138,7 +138,7 @@
                         : 'bg-purple-600'
                     "
                   >
-                    {{ habit.frequency }}
+                    {{ getFrequencyLabel(habit.frequency) }}
                   </span>
                 </div>
                 <p class="text-sm text-gray-400">{{ habit.description }}</p>
@@ -184,6 +184,7 @@ import { ref, onMounted, computed } from "vue";
 import { type UserProfile, type Habit } from "../types/interfaces";
 import { useUserStore } from "../store/userStore";
 import { useHabitStore } from "../store/habitStore";
+import { useEnumLabels } from "../composables/Labels";
 import Chart from "chart.js/auto";
 
 // Types
@@ -196,6 +197,8 @@ interface ChartData {
 // User store
 const userStore = useUserStore();
 const habitStore = useHabitStore();
+
+const { getFrequencyLabel } = useEnumLabels();
 
 // State
 const todayHabits = computed(() => habitStore.todayHabits);
@@ -218,7 +221,6 @@ const totalXpEarned = computed(() =>
 );
 
 // Methods
-
 const fetchChartData = async () => {
   try {
     // In a real app, this would be an API call

@@ -170,8 +170,8 @@
                   id="xpValue"
                   v-model.number="form.xpValue"
                   type="number"
-                  min="1"
-                  max="1000"
+                  min="0"
+                  max="200"
                   class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                   placeholder="Leave empty to use difficulty XP"
                 />
@@ -311,7 +311,7 @@ interface HabitForm {
   frequency: HabitFrequency;
   category: string;
   difficulty: Difficulty;
-  xpValue: number | null;
+  xpValue: number;
   reminderEnabled: boolean;
   reminderTime: string;
 }
@@ -332,7 +332,7 @@ const form = reactive<HabitForm>({
   frequency: HabitFrequency.Daily,
   category: "",
   difficulty: Difficulty.Easy,
-  xpValue: null,
+  xpValue: 0,
   reminderEnabled: false,
   reminderTime: "09:00",
 });
@@ -385,8 +385,8 @@ const finalXpValue = computed(() => {
   if (form.xpValue && form.xpValue > 0) {
     return form.xpValue;
   }
-  const difficulty = difficultyLevels.find((d) => d.value === "Easy");
-  return difficulty?.xp || 10;
+  const difficulty = difficultyLevels.find((d) => d.enumValue === form.difficulty);
+  return difficulty?.xp;
 });
 
 const isFormValid = computed(() => {
@@ -423,7 +423,7 @@ const submitHabit = async () => {
       frequency: form.frequency,
       category: form.category || "Other",
       difficulty: form.difficulty,
-      xpValue: form.xpValue && form.xpValue > 0 ? form.xpValue : null,
+      xpValue: form.xpValue && form.xpValue > 0 ? form.xpValue : 0,
       reminderEnabled: form.reminderEnabled,
       reminderTime: "09:00",
     };
