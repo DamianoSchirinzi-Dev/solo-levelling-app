@@ -22,7 +22,7 @@ namespace SoloLevellingApp.API.Controllers
             _xpService = xpService;
         }
 
-        [HttpGet("user-completions")]
+        [HttpGet("today")]
         public IActionResult GetTodayUserCompletions()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);

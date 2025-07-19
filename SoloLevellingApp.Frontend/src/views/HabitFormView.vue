@@ -74,9 +74,9 @@
                 <div class="space-y-2">
                   <label class="flex items-center">
                     <input
-                      v-model="form.frequency"
+                      v-model.number="form.frequency"
                       type="radio"
-                      value="Daily"
+                      :value="HabitFrequency.Daily"
                       class="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 focus:ring-purple-500"
                     />
                     <span class="ml-2">Daily Quest</span>
@@ -84,9 +84,9 @@
                   </label>
                   <label class="flex items-center">
                     <input
-                      v-model="form.frequency"
+                      v-model.number="form.frequency"
                       type="radio"
-                      value="Weekly"
+                      :value="HabitFrequency.Weekly"
                       class="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 focus:ring-purple-500"
                     />
                     <span class="ml-2">Weekly Quest</span>
@@ -133,7 +133,7 @@
                     :key="difficulty.value"
                     class="flex items-center p-3 rounded-lg border transition-colors cursor-pointer"
                     :class="
-                      form.difficulty === difficulty.value
+                      form.difficulty === difficulty.enumValue
                         ? 'border-purple-500 bg-purple-900/30'
                         : 'border-gray-600 hover:border-gray-500'
                     "
@@ -141,7 +141,7 @@
                     <input
                       v-model="form.difficulty"
                       type="radio"
-                      :value="difficulty.value"
+                      :value="difficulty.enumValue"
                       class="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 focus:ring-purple-500"
                     />
                     <div class="ml-3 flex-1">
@@ -308,16 +308,17 @@ const LoadingSpinner = {
 interface HabitForm {
   name: string;
   description: string;
-  frequency: "Daily" | "Weekly" | "Monthly" | "Daily";
+  frequency: HabitFrequency;
   category: string;
-  difficulty: "Easy" | "Medium" | "Hard" | "Expert";
+  difficulty: Difficulty;
   xpValue: number | null;
   reminderEnabled: boolean;
   reminderTime: string;
 }
 
 interface DifficultyLevel {
-  value: "Easy" | "Medium" | "Hard" | "Expert";
+  value: string;
+  enumValue: Difficulty;
   label: string;
   emoji: string;
   xp: number;
@@ -328,9 +329,9 @@ interface DifficultyLevel {
 const form = reactive<HabitForm>({
   name: "",
   description: "",
-  frequency: "Daily",
+  frequency: HabitFrequency.Daily,
   category: "",
-  difficulty: "Easy",
+  difficulty: Difficulty.Easy,
   xpValue: null,
   reminderEnabled: false,
   reminderTime: "09:00",
@@ -347,6 +348,7 @@ const showSuccess = ref(false);
 const difficultyLevels: DifficultyLevel[] = [
   {
     value: "Easy",
+    enumValue: Difficulty.Easy,
     label: "Novice",
     emoji: "🟢",
     xp: 10,
@@ -354,6 +356,7 @@ const difficultyLevels: DifficultyLevel[] = [
   },
   {
     value: "Medium",
+    enumValue: Difficulty.Medium,
     label: "Adventurer",
     emoji: "🟡",
     xp: 25,
@@ -361,6 +364,7 @@ const difficultyLevels: DifficultyLevel[] = [
   },
   {
     value: "Hard",
+    enumValue: Difficulty.Hard,
     label: "Warrior",
     emoji: "🟠",
     xp: 50,
@@ -368,6 +372,7 @@ const difficultyLevels: DifficultyLevel[] = [
   },
   {
     value: "Expert",
+    enumValue: Difficulty.Expert,
     label: "Legend",
     emoji: "🔴",
     xp: 100,
@@ -380,16 +385,13 @@ const finalXpValue = computed(() => {
   if (form.xpValue && form.xpValue > 0) {
     return form.xpValue;
   }
-  const difficulty = difficultyLevels.find((d) => d.value === form.difficulty);
+  const difficulty = difficultyLevels.find((d) => d.value === "Easy");
   return difficulty?.xp || 10;
 });
 
 const isFormValid = computed(() => {
   return (
-    form.name.trim().length > 0 &&
-    form.frequency &&
-    form.difficulty &&
-    !errors.name
+    form.name.trim().length > 0
   );
 });
 
@@ -418,7 +420,7 @@ const submitHabit = async () => {
     const habitData: HabitForm = {
       name: form.name.trim(),
       description: form.description.trim(),
-      frequency: "Daily",
+      frequency: form.frequency,
       category: form.category || "Other",
       difficulty: form.difficulty,
       xpValue: form.xpValue && form.xpValue > 0 ? form.xpValue : null,
@@ -452,9 +454,9 @@ const resetForm = () => {
   Object.assign(form, {
     name: "",
     description: "",
-    frequency: "Daily",
+    frequency: HabitFrequency.Daily,
     category: "",
-    difficulty: "Easy",
+    difficulty: Difficulty.Easy,
     xpValue: null,
     reminderEnabled: false,
     reminderTime: "09:00",
@@ -472,5 +474,6 @@ const goBack = () => {
 
 // Watch for name changes to validate in real-time
 import { watch } from "vue";
+import { Difficulty, HabitFrequency } from "../types/enums";
 watch(() => form.name, validateTitle);
 </script>

@@ -97,7 +97,7 @@ namespace SoloLevellingApp.API.Controllers
             return Ok(habits);
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         public IActionResult CreateHabit(CreateHabitDto dto) 
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
