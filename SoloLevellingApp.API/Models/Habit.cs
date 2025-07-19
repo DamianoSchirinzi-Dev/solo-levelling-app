@@ -9,9 +9,13 @@ namespace SoloLevellingApp.API.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public HabitFrequency Frequency { get; set; } // Enum for frequency of the habit
+        public HabitFrequency Frequency { get; set; } 
+        public Difficulty Difficulty { get; set; } 
+        public string Category { get; set; } = "Other"; //Make enum
         public int CurrentStreak { get; set; }
-        public int XPValue { get; set; } 
+        public int XpValue { get; set; } 
+        public bool ReminderEnabled { get; set; }
+        public string ReminderTime { get; set; }
         public DateTime? LastCompletedAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

@@ -35,6 +35,7 @@ namespace SoloLevellingApp.API.Controllers
                 PasswordHash = _authService.HashPassword(registerDto.Password),
                 XP = 0,
                 Level = 1,
+                Title = "Recruit"
             };
 
             _context.Users.Add(user);

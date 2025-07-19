@@ -35,7 +35,7 @@ namespace SoloLevellingApp.API.Controllers
                     Frequency = h.Frequency,
                     CreatedAt = h.CreatedAt,
                     UpdatedAt = h.UpdatedAt,
-                    XPValue = h.XPValue,
+                    XPValue = h.XpValue,
                 })
                 .ToList();
 
@@ -58,7 +58,7 @@ namespace SoloLevellingApp.API.Controllers
                     Frequency = h.Frequency,
                     CreatedAt = h.CreatedAt,
                     UpdatedAt = h.UpdatedAt,
-                    XPValue = h.XPValue,
+                    XPValue = h.XpValue,
                 })
                 .FirstOrDefault();
 
@@ -90,7 +90,7 @@ namespace SoloLevellingApp.API.Controllers
                     Frequency = h.Frequency,
                     CreatedAt = h.CreatedAt,
                     UpdatedAt = h.UpdatedAt,
-                    XPValue = h.XPValue
+                    XPValue = h.XpValue
                 })
                 .ToList();
 
@@ -107,6 +107,11 @@ namespace SoloLevellingApp.API.Controllers
                 Name = dto.Name,
                 Description = dto.Description,
                 Frequency = dto.Frequency,
+                Category = dto.Category,
+                Difficulty = dto.Difficulty,
+                XpValue = dto.XpValue,
+                ReminderEnabled = dto.ReminderEnabled,
+                ReminderTime = dto.ReminderTime,
                 UserId = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -121,6 +126,11 @@ namespace SoloLevellingApp.API.Controllers
                 Name = habit.Name,
                 Description = habit.Description,
                 Frequency = habit.Frequency,
+                Category = habit.Category,
+                Difficulty = habit.Difficulty,
+                XPValue = habit.XpValue,
+                ReminderEnabled = habit.ReminderEnabled,
+                ReminderTime = habit.ReminderTime,
                 CreatedAt = habit.CreatedAt
             };
 

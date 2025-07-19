@@ -311,7 +311,7 @@ interface HabitForm {
   frequency: HabitFrequency;
   category: string;
   difficulty: Difficulty;
-  xpValue: number;
+  xpValue: number | null;
   reminderEnabled: boolean;
   reminderTime: string;
 }
@@ -332,7 +332,7 @@ const form = reactive<HabitForm>({
   frequency: HabitFrequency.Daily,
   category: "",
   difficulty: Difficulty.Easy,
-  xpValue: 0,
+  xpValue: null,
   reminderEnabled: false,
   reminderTime: "09:00",
 });
@@ -386,7 +386,8 @@ const finalXpValue = computed(() => {
     return form.xpValue;
   }
   const difficulty = difficultyLevels.find((d) => d.enumValue === form.difficulty);
-  return difficulty?.xp;
+  console.log("Final XP Value Computed:", difficulty?.xp);
+  return difficulty?.xp || 10;
 });
 
 const isFormValid = computed(() => {
@@ -423,7 +424,7 @@ const submitHabit = async () => {
       frequency: form.frequency,
       category: form.category || "Other",
       difficulty: form.difficulty,
-      xpValue: form.xpValue && form.xpValue > 0 ? form.xpValue : 0,
+      xpValue: finalXpValue.value,
       reminderEnabled: form.reminderEnabled,
       reminderTime: "09:00",
     };
